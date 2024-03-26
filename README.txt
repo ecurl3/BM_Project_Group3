@@ -1,6 +1,6 @@
 Group Members:
 
-Anastasia Spencer (Leader an Animation)
+Anastasia Spencer (Leader and Animation)
 Nate Paul (Animation)
 Jacob Santos (Algorithm Implementation)
 Tyler Coleman (Algorithm Implementation)
@@ -10,4 +10,3 @@ Daniel Tsark (Testing and Debugging)
 Lucas Underbakke (Presentation)
 
 This project implements the Gale-Shapley algorithm to solve the Stable Marriage Problem.
- 
