@@ -42,11 +42,11 @@ You can now run the program
 ## Leader
 Anastasia Spencer
 ## Animation
-Nate Paul
-Anastasia Spencer
+Nate Paul__
+Anastasia Spencer__
 ## Algorithm Implementation
-Jacob Santos
-Tyler Coleman
+Jacob Santos__
+Tyler Coleman__
 Emily Curl
 ## Testing and Debugging
 Brooke Boskus
