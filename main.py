@@ -10,7 +10,7 @@ __authors__ = "BM_GROUP_3 coders: Jacob, Tyler, Emily"
 def main():
 
     if (len(sys.argv) != 2):
-        print("Execute with './Gale_Shapley.py <number>'")
+        print("Execute with './main.py <number>'")
         sys.exit(0)
 
     n = int(sys.argv[1])
