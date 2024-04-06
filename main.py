@@ -3,6 +3,7 @@ import sys
 import random
 from functions import print_preferences_before, gen_random_preference, print_engagements_after
 from Gale_Shapley import algo
+from animation import matrixToGraph, doAnimation
 
 __authors__ = "BM_GROUP_3 coders: Jacob, Tyler, Emily"
 
@@ -17,7 +18,8 @@ def main():
 
     preference = []
     preference = gen_random_preference(n)
-
+    matrixToGraph(preference)
+    doAnimation()
     print_preferences_before(preference)
 
     result = algo(preference)
