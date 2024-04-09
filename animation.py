@@ -13,22 +13,24 @@ numberOfAnimationFrames = 0 #holds the total number of animation frames includin
 matchingNodes = [] #list that holds the maximum matching solution
 
 def matrixToGraph(matrix): #fix me: may need to be modified for more that 26 nodes
+    num_nodes = len(matrix)
+    half_nodes = num_nodes // 2;
+    
     #add left nodes to graph
-    for i in range(len(matrix)): #increment i until it equals the number of rows 
+    for i in range(half_nodes): #increment i until it equals the number of rows 
         g.add_node(alcL[i]) #add node
         positions[alcL[i]] = [0, i] #make position on left by making its ordered pair start with 0 and its y value  its column number
         nodeLabels.append(alcL[i]) #add the node label to the list
 
     #add right nodes to graph
-    for j in range(len(matrix[0])): #increment j until it equals the number of columns
-        g.add_node(alcU[j]) #add node
-        positions[alcU[j]] = [1, j] #make position on right by making its ordered pair start with its row number and its y value be 1   
-        nodeLabels.append(alcU[j]) #add the node label to the list
+    for i in range(half_nodes, num_nodes): #increment j until it equals the number of columns
+        g.add_node(alcU[i]) #add node
+        positions[alcU[i]] = [1, i - half_nodes] #make position on right by making its ordered pair start with its row number and its y value be 1   
+        nodeLabels.append(alcU[i]) #add the node label to the list
 
     #add edges to graph
-    for i in range(len(matrix)): #increment through the rows of the matrix
-        for j in range(len(matrix[i])): #increment through the columns of the matrix
-            if matrix[i][j] != 0: #if there is a edge between the nodes (which is when matrix entry is anything besides 0)
+    for i in range(half_nodes): #increment through the rows of the matrix
+        for j in range(half_nodes, num_nodes): #increment through the columns of the matrix
                 g.add_edge(alcL[i], alcU[j]) #add edge to graph
 
 def drawBaseGraph():
@@ -48,7 +50,58 @@ def drawBaseGraph():
       # Add title to graph
     ax.set_title("Stable Marriage Problem", fontweight="bold")  # Set the ax graph title to indicate the problem
 
-     
+def animation(num):
+    ax.clear()
+
+    if(num == 0): #if first frame of animation
+        drawBaseGraph() #draw base graph
+        return
+    
+    if (num == numberOfAnimationFrames - 1): #if last frame
+        drawFinalSolution() #draw final solution
+        return
+    
+    #set up path
+    currentTravel = traveledPath[num - 1:num] #get the edge traveled from traveledPath corresponding to the animation frame
+    path = [currentTravel[0][0], currentTravel[0][1]] #convert list pair of nodes into a single list fix me
+    
+    #draw edges and labels
+    nx.draw_networkx_edges(g, positions, ax = ax, edge_color = "black") #draw all the edges in the graph using the positions in black to the ax graph
+    nx.draw_networkx_labels(g, positions,  font_color = "black", ax = ax) #add all the labels of the nodes in the graph in black to the ax graph
+
+    #draw nodes not being traveled
+    nx.draw_networkx_nodes(g, positions, nodelist = set(g.nodes()) - set(path), node_color = "gray", ax = ax) #draw nodes from the graph that are not in the path set using the positions dictionary in gray on the ax graph
+
+    #draw nodes being traveled and change edge color
+    nx.draw_networkx_nodes(g, positions, nodelist = path, node_color = "pink", ax = ax) #draw nodes from the graph that are in the path in pink on the ax graph
+    edgelist = [[path[0], path[1]]] #create a list of lists of the edge traveled
+    nx.draw_networkx_edges(g, positions, edgelist = edgelist, width = 3, ax = ax, edge_color = "pink") #recolor the traveled node to be pink and to be a wider line
+    
+    #add title to graph
+    ax.set_title("Traveling: " + " -> ".join(path), fontweight = "bold") #set the ax graph title to tell what is happening
+    
+def drawFinalSolution():
+    #convert list with lists to list   
+    matches = [] #this list holds all the nodes that have a match
+    for a in matchingNodes: #travel through all the list entries in the list of lists
+        for b in a: #travel through all the values in the lists within the list
+            matches.append(b) #add individual values to new list
+
+    #draw edges and put labels on nodes
+    nx.draw_networkx_edges(g, positions, ax = ax, edge_color = "black") #draw all the edges in the ax graph in black
+    nx.draw_networkx_labels(g, positions,  font_color= "black", ax = ax) #add all the labels of the ndoes to the ax graph in black
+
+    #draw nodes that do not have a match
+    nx.draw_networkx_nodes(g, positions, nodelist = set(g.nodes()) - set(matches), ax = ax, node_color= "gray") #draw nodes from the graph that are not in the path set using the positions dictionary in gray on the ax graph
+
+    #draw nodes that are a match
+    nx.draw_networkx_nodes(g, positions, nodelist =  matches, ax = ax, node_color= "purple") #draw the nodes that have a match in purple into the ax graph
+    edgelist = [matchingNodes[k] for k in range(len(matchingNodes))] #create the an edgelist to hold a list of lists of the node pairings that are matches
+    nx.draw_networkx_edges(g, positions, edgelist = edgelist, width = 3, ax = ax, edge_color = "purple") #draw the matched edges in purple
+
+    #add title to graph
+    ax.set_title("Matching Solution: ", fontweight = "bold") #set the ax graph title to tell what is happening
+
 def doAnimation():
     #draw starting graph to prevent the starting graph from being blank
     drawBaseGraph() #call function to draw base bipartite graph
@@ -58,10 +111,3 @@ def doAnimation():
 
     #show animation
     plt.show() #causes animation to display
-
-def animation(num):
-    ax.clear()
-
-    if(num == 0):
-        drawBaseGraph()
-        return
