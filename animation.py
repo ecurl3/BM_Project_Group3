@@ -2,7 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from string import ascii_lowercase as alcL
 from string import ascii_uppercase as alcU
-from copy import copy, deepcopy
+from Gale_Shapley import stepwise
 import matplotlib.animation as ma
 
 fig, ax = plt.subplots() #set up figure and axis for graph visual
@@ -82,38 +82,25 @@ def drawBaseGraph(preferences):
       # Add title to graph
     ax.set_title("Stable Marriage Problem", fontweight="bold")  # Set the ax graph title to indicate the problem
 
-#TODO: Chang implementation to show Gale_Shapley algorithim
-def animation(num, preferences):
-    ax.clear()
+#TODO: Change implementation to show Gale_Shapley algorithim
+def update(frame, preferences):
+    #TODO: Fix logic so that every n??? frames the outer loop goes is performed, and every frame the inner loop is updated
+    current_step_outer = frame  
+    current_step_inner = 0
+    
+    #clear current plot
+    plt.clf()
+    
+    # TODO: Call the Gale-Shapley algorithm (stepwise) for each frame
+    # Input will require preference list + the current step of the inner loop 
+    # + current step of outer loop and obtain the matching pairs or other relevant 
+    # information
+    prefW, freeM, proposals, engagements, current_step_inner = stepwise(preferences, current_step_outer, current_step_inner)
+    
+    # TODO: Update the graph visualization based on the matching pairs
+    # For example, you can highlight the matched edges
 
-    if(num == 0): #if first frame of animation
-        drawBaseGraph(preferences) #draw base graph
-        return
-    
-    if (num == numberOfAnimationFrames - 1): #if last frame
-        drawFinalSolution() #draw final solution
-        return
-    
-    #set up path
-    currentTravel = traveledPath[num - 1:num] #get the edge traveled from traveledPath corresponding to the animation frame
-    path = [currentTravel[0][0], currentTravel[0][1]] #convert list pair of nodes into a single list fix me
-    
-    #draw edges and labels
-    nx.draw_networkx_edges(g, positions, ax = ax, edge_color = "black") #draw all the edges in the graph using the positions in black to the ax graph
-    nx.draw_networkx_labels(g, positions,  font_color = "black", ax = ax) #add all the labels of the nodes in the graph in black to the ax graph
-
-    #draw nodes not being traveled
-    nx.draw_networkx_nodes(g, positions, nodelist = set(g.nodes()) - set(path), node_color = "gray", ax = ax) #draw nodes from the graph that are not in the path set using the positions dictionary in gray on the ax graph
-
-    #draw nodes being traveled and change edge color
-    nx.draw_networkx_nodes(g, positions, nodelist = path, node_color = "pink", ax = ax) #draw nodes from the graph that are in the path in pink on the ax graph
-    edgelist = [[path[0], path[1]]] #create a list of lists of the edge traveled
-    nx.draw_networkx_edges(g, positions, edgelist = edgelist, width = 3, ax = ax, edge_color = "pink") #recolor the traveled node to be pink and to be a wider line
-    
-    #add title to graph
-    ax.set_title("Traveling: " + " -> ".join(path), fontweight = "bold") #set the ax graph title to tell what is happening
-    
-#TODO: Fix final graph
+#TODO: Fix final graph / Might be able to just implement this logic in update
 def drawFinalSolution():
     #convert list with lists to list   
     matches = [] #this list holds all the nodes that have a match
@@ -141,7 +128,7 @@ def doAnimation(preferences):
     drawBaseGraph(preferences) #call function to draw base bipartite graph
     
     #animate
-    ani = ma.FuncAnimation(fig, animation, frames = numberOfAnimationFrames, interval = 1500, repeat = True) #using the animation function, create a repeating animatiion consisting of the different drawn graphs
+    ani = ma.FuncAnimation(fig, update, frames = numberOfAnimationFrames, interval = 1500, fargs=(preferences,) repeat = True) #using the animation function, create a repeating animatiion consisting of the different drawn graphs
 
     #show animation
     plt.show() #causes animation to display
