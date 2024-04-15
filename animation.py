@@ -90,15 +90,28 @@ def update(frame, preferences):
     
     #clear current plot
     plt.clf()
+
+    if frame == 0:
+        drawBaseGraph(preferences)
     
     # TODO: Call the Gale-Shapley algorithm (stepwise) for each frame
     # Input will require preference list + the current step of the inner loop 
     # + current step of outer loop and obtain the matching pairs or other relevant 
     # information
     prefW, freeM, proposals, engagements, current_step_inner = stepwise(preferences, current_step_outer, current_step_inner)
-    
+
+    for woman, man in engagements.items():
+        matchingNodes.append([woman, man])
+
+    if frame == numberOfAnimationFrames - 1:
+        drawFinalSolution()
+
     # TODO: Update the graph visualization based on the matching pairs
     # For example, you can highlight the matched edges
+
+    for woman, man in engagements.items():
+        edge_color = "green"  # color for matched edges
+        nx.draw_networkx_edges(g, positions, edgelist=[(man, woman)], ax=ax, edge_color=edge_color)
 
 #TODO: Fix final graph / Might be able to just implement this logic in update
 def drawFinalSolution():
@@ -128,7 +141,7 @@ def doAnimation(preferences):
     drawBaseGraph(preferences) #call function to draw base bipartite graph
     
     #animate
-    ani = ma.FuncAnimation(fig, update, frames = numberOfAnimationFrames, interval = 1500, fargs=(preferences,) repeat = True) #using the animation function, create a repeating animatiion consisting of the different drawn graphs
+    ani = ma.FuncAnimation(fig, update, frames = numberOfAnimationFrames, interval = 1500, fargs=(preferences,), repeat = True) #using the animation function, create a repeating animatiion consisting of the different drawn graphs
 
     #show animation
     plt.show() #causes animation to display
