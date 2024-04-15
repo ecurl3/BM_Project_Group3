@@ -19,7 +19,7 @@ def main():
     preference = []
     preference = gen_random_preference(n)
     matrixToGraph(preference)
-    doAnimation()
+    doAnimation(preference)
     print_preferences_before(preference)
 
     result = algo(preference)

@@ -2,6 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from string import ascii_lowercase as alcL
 from string import ascii_uppercase as alcU
+from copy import copy, deepcopy
 import matplotlib.animation as ma
 
 fig, ax = plt.subplots() #set up figure and axis for graph visual
@@ -14,7 +15,7 @@ matchingNodes = [] #list that holds the maximum matching solution
 
 def matrixToGraph(matrix): #fix me: may need to be modified for more that 26 nodes
     num_nodes = len(matrix)
-    half_nodes = num_nodes // 2;
+    half_nodes = num_nodes // 2
     
     #add left nodes to graph
     for i in range(half_nodes): #increment i until it equals the number of rows 
@@ -33,9 +34,40 @@ def matrixToGraph(matrix): #fix me: may need to be modified for more that 26 nod
         for j in range(half_nodes, num_nodes): #increment through the columns of the matrix
                 g.add_edge(alcL[i], alcU[j]) #add edge to graph
 
-def drawBaseGraph():
 
-    nx.draw_networkx_edges(g, positions, ax=ax, edge_color="black")
+def assign_edge_colors(g, preferences):
+    edge_colors = []
+    color_map = plt.cm.get_cmap('Blues')
+    
+    for edge in g.edges():
+        node1, node2 = edge
+        
+        # Determine the indices of the nodes in the preference list
+        node1_index = alcL.index(node1) if node1 in alcL else alcU.index(node1)
+        node2_index = alcL.index(node2) if node2 in alcL else alcU.index(node2)
+        
+        # Calculate preference scores for both nodes
+        preference_score1 = abs(node1_index - node2_index)
+        preference_score2 = abs(node2_index - node1_index)
+        
+        # Calculate the maximum preference score
+        max_preference = len(g.nodes()) // 2 - 1
+        
+        # Calculate color values for both nodes
+        color_value1 = 1 - (preference_score1 / max_preference)
+        color_value2 = 1 - (preference_score2 / max_preference)
+        
+        # Assign color to the edge based on the average color value of both nodes
+        edge_color = color_map(((color_value1 + color_value2) / 2) + 1)
+        
+        edge_colors.append(edge_color)
+
+    return edge_colors
+
+def drawBaseGraph(preferences):
+    edge_colors = assign_edge_colors(g, preferences)
+
+    nx.draw_networkx_edges(g, positions, ax=ax, edge_color=edge_colors)
 
     #Draw nodes for men(lef) and women (right)
     men_nodes = [node for node in g.nodes() if node in alcL]
@@ -50,11 +82,12 @@ def drawBaseGraph():
       # Add title to graph
     ax.set_title("Stable Marriage Problem", fontweight="bold")  # Set the ax graph title to indicate the problem
 
-def animation(num):
+#TODO: Chang implementation to show Gale_Shapley algorithim
+def animation(num, preferences):
     ax.clear()
 
     if(num == 0): #if first frame of animation
-        drawBaseGraph() #draw base graph
+        drawBaseGraph(preferences) #draw base graph
         return
     
     if (num == numberOfAnimationFrames - 1): #if last frame
@@ -80,6 +113,7 @@ def animation(num):
     #add title to graph
     ax.set_title("Traveling: " + " -> ".join(path), fontweight = "bold") #set the ax graph title to tell what is happening
     
+#TODO: Fix final graph
 def drawFinalSolution():
     #convert list with lists to list   
     matches = [] #this list holds all the nodes that have a match
@@ -102,9 +136,9 @@ def drawFinalSolution():
     #add title to graph
     ax.set_title("Matching Solution: ", fontweight = "bold") #set the ax graph title to tell what is happening
 
-def doAnimation():
+def doAnimation(preferences):
     #draw starting graph to prevent the starting graph from being blank
-    drawBaseGraph() #call function to draw base bipartite graph
+    drawBaseGraph(preferences) #call function to draw base bipartite graph
     
     #animate
     ani = ma.FuncAnimation(fig, animation, frames = numberOfAnimationFrames, interval = 1500, repeat = True) #using the animation function, create a repeating animatiion consisting of the different drawn graphs
